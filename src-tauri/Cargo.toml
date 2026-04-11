@@ -51,5 +51,5 @@ reqwest = { version = "0.13.2", features = ["json"] }
 keyring = { version = "3", features = ["apple-native"] }
 
 # TypeScript type generation
-ts-rs = { version = "10", features = ["serde-compat"] }
+ts-rs = { version = "12", features = ["serde-compat"] }
 
