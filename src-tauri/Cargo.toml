@@ -45,7 +45,7 @@ uuid = { version = "1", features = ["v4", "serde"] }
 
 # Export
 csv = "1"
-reqwest = { version = "0.13.1", features = ["json"] }
+reqwest = { version = "0.13.2", features = ["json"] }
 
 # Keyring for secure password storage
 keyring = { version = "3", features = ["apple-native"] }
