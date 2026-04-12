@@ -1,5 +1,7 @@
-import { Database, Settings, Unplug } from "lucide-react";
+import { useState } from "react";
+import { Database, Keyboard, Settings, Unplug } from "lucide-react";
 import { ConnectionDialog } from "../connection";
+import { KeyboardShortcutsDialog } from "../KeyboardShortcutsDialog";
 import { useConnectionStore } from "../../store/connectionStore";
 import { Button } from "../ui/button";
 import {
@@ -17,6 +19,7 @@ export function Header() {
     shouldShowConnectionDialog,
     setShouldShowConnectionDialog,
   } = useConnectionStore();
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
   return (
     <TooltipProvider>
@@ -61,6 +64,18 @@ export function Header() {
         <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setIsShortcutsOpen(true)}
+              >
+                <Keyboard className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Keyboard Shortcuts</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <Button variant="ghost" size="icon-sm">
                 <Settings className="h-4 w-4" />
               </Button>
@@ -73,6 +88,10 @@ export function Header() {
       <ConnectionDialog
         isOpen={shouldShowConnectionDialog}
         onClose={() => setShouldShowConnectionDialog(false)}
+      />
+      <KeyboardShortcutsDialog
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
       />
     </TooltipProvider>
   );

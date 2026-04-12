@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
-import { Play, Download, X, FileSpreadsheet } from "lucide-react";
+import { Play, Download, X, FileSpreadsheet, History } from "lucide-react";
 import { SqlEditor } from "../editor";
 import { ResultGrid } from "../result";
 import { ErDiagram } from "../er-diagram";
@@ -26,6 +26,7 @@ import { cn } from "../../lib/utils";
 export function MainPanel() {
   const [activeTab, setActiveTab] = useState<"query" | "er">("query");
   const [isAiSettingsOpen, setIsAiSettingsOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const {
     executeQuery,
@@ -36,6 +37,7 @@ export function MainPanel() {
     currentSchema,
     currentTable,
     exitCrudMode,
+    queryHistory,
   } = useQueryStore();
   const { isConnected } = useConnectionStore();
 
@@ -68,14 +70,28 @@ export function MainPanel() {
   return (
     <TooltipProvider>
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* AI Query Bar + History */}
-        <div className="flex h-24 shrink-0">
-          <div className="w-3/5 min-w-0">
-            <AiQueryBar onSettingsClick={() => setIsAiSettingsOpen(true)} />
-          </div>
-          <div className="w-2/5">
-            <QueryHistory />
-          </div>
+        {/* AI Query Bar */}
+        <div className="relative">
+          <AiQueryBar onSettingsClick={() => setIsAiSettingsOpen(true)} />
+
+          {/* History toggle button */}
+          <button
+            onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+            className={cn(
+              "absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-[12px] transition-colors",
+              isHistoryOpen
+                ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+                : "text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]"
+            )}
+            aria-label="Toggle query history"
+          >
+            <History className="h-3.5 w-3.5" />
+            {queryHistory.length > 0 && (
+              <span className="min-w-[1.25rem] rounded-full bg-[hsl(var(--muted))] px-1 text-center text-[10px] font-medium">
+                {queryHistory.length}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Tabs and Run Button */}
@@ -165,8 +181,17 @@ export function MainPanel() {
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {activeTab === "query" ? <QueryPanel /> : <ErDiagramPanel />}
+        <div className="relative flex flex-1 flex-col overflow-hidden">
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {activeTab === "query" ? <QueryPanel /> : <ErDiagramPanel />}
+          </div>
+
+          {/* History overlay panel */}
+          {isHistoryOpen && (
+            <div className="absolute right-0 top-0 z-10 h-full w-[320px] border-l border-[hsl(var(--border))] shadow-lg">
+              <QueryHistory onClose={() => setIsHistoryOpen(false)} />
+            </div>
+          )}
         </div>
 
         {/* AI Settings Dialog */}

@@ -1,4 +1,11 @@
-import { History, Trash2, Clock, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  History,
+  Trash2,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  X,
+} from "lucide-react";
 import { useQueryStore, type QueryHistoryItem } from "../../store/queryStore";
 import { Button } from "../ui/button";
 import {
@@ -10,7 +17,11 @@ import {
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "../../lib/utils";
 
-export function QueryHistory() {
+interface QueryHistoryProps {
+  onClose?: () => void;
+}
+
+export function QueryHistory({ onClose }: QueryHistoryProps) {
   const { queryHistory, setQuery, clearHistory } = useQueryStore();
 
   const handleSelect = (item: QueryHistoryItem) => {
@@ -32,35 +43,51 @@ export function QueryHistory() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-full flex-col border-l border-[hsl(var(--border))] bg-[hsl(var(--muted))]">
+      <div className="flex h-full flex-col bg-[hsl(var(--background))]">
         {/* Header */}
-        <div className="flex items-center justify-between px-3 py-2">
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-[hsl(var(--muted-foreground))]">
+        <div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-3 py-2">
+          <div className="flex items-center gap-1.5 text-[12px] font-medium text-[hsl(var(--foreground))]">
             <History className="h-3.5 w-3.5" />
             History
           </div>
-          {queryHistory.length > 0 && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={clearHistory}
-                  className="h-6 w-6"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Clear History</TooltipContent>
-            </Tooltip>
-          )}
+          <div className="flex items-center gap-1">
+            {queryHistory.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={clearHistory}
+                    className="h-6 w-6"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Clear History</TooltipContent>
+              </Tooltip>
+            )}
+            {onClose && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={onClose}
+                className="h-6 w-6"
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* History list */}
         <ScrollArea className="flex-1">
           {queryHistory.length === 0 ? (
-            <div className="p-3 text-center text-[11px] text-[hsl(var(--muted-foreground))]">
-              No queries yet
+            <div className="flex flex-col items-center justify-center gap-2 p-6 text-[hsl(var(--muted-foreground))]">
+              <History className="h-8 w-8 opacity-30" />
+              <div className="text-[12px] font-medium">No queries yet</div>
+              <div className="text-[11px] opacity-70">
+                Queries will appear here after execution
+              </div>
             </div>
           ) : (
             <div className="p-2">
@@ -81,8 +108,8 @@ export function QueryHistory() {
                       <CheckCircle className="h-3 w-3 mt-0.5 shrink-0 text-[hsl(var(--success))]" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-[var(--font-mono)] text-[11px] leading-tight truncate">
-                        {truncateQuery(item.query)}
+                      <div className="font-[var(--font-mono)] text-[11px] leading-tight line-clamp-3">
+                        {truncateQuery(item.query, 300)}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[hsl(var(--muted-foreground))]">
                         <span className="flex items-center gap-0.5">

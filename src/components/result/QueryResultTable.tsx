@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,17 +15,14 @@ interface QueryResultTableProps {
   result: QueryResult;
   columnWidths: number[];
   onResizeStart: (e: React.MouseEvent, index: number) => void;
-  sorting: SortingState;
-  onSortingChange: (sorting: SortingState) => void;
 }
 
 export function QueryResultTable({
   result,
   columnWidths,
   onResizeStart,
-  sorting,
-  onSortingChange,
 }: QueryResultTableProps) {
+  const [sorting, onSortingChange] = useState<SortingState>([]);
   const columnHelper = createColumnHelper<unknown[]>();
 
   const columns = useMemo<ColumnDef<unknown[], unknown>[]>(() => {

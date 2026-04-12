@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import type { TableColumnInfo } from "../../types/query";
 
 interface EditableCellProps {
@@ -27,12 +27,11 @@ export function EditableCell({
   const [editValue, setEditValue] = useState<string>("");
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    if (isEditing) {
-      setEditValue(formatValue(value));
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
-  }, [isEditing, value]);
+  const beginEdit = useCallback(() => {
+    setEditValue(formatValue(value));
+    onStartEdit();
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }, [value, onStartEdit]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -55,9 +54,9 @@ export function EditableCell({
 
   const handleDoubleClick = useCallback(() => {
     if (!readOnly && !isDeleted) {
-      onStartEdit();
+      beginEdit();
     }
-  }, [readOnly, isDeleted, onStartEdit]);
+  }, [readOnly, isDeleted, beginEdit]);
 
   // Render editing mode
   if (isEditing) {
@@ -92,7 +91,7 @@ export function EditableCell({
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="h-full w-full border-0 bg-blue-50 px-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-900/30"
+          className="h-full w-full border-0 bg-[hsl(var(--primary))]/10 px-2 outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] dark:bg-[hsl(var(--primary))]/20"
         />
       );
     }
@@ -107,7 +106,7 @@ export function EditableCell({
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="h-full w-full border-0 bg-blue-50 px-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-900/30"
+          className="h-full w-full border-0 bg-[hsl(var(--primary))]/10 px-2 outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] dark:bg-[hsl(var(--primary))]/20"
         />
       );
     }
@@ -122,7 +121,7 @@ export function EditableCell({
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="h-full w-full border-0 bg-blue-50 px-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-900/30"
+          className="h-full w-full border-0 bg-[hsl(var(--primary))]/10 px-2 outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] dark:bg-[hsl(var(--primary))]/20"
         />
       );
     }
@@ -136,7 +135,7 @@ export function EditableCell({
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="h-full min-h-15 w-full resize-none border-0 bg-blue-50 px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-900/30"
+          className="h-full min-h-15 w-full resize-none border-0 bg-[hsl(var(--primary))]/10 px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] dark:bg-[hsl(var(--primary))]/20"
           rows={3}
         />
       );
@@ -151,7 +150,7 @@ export function EditableCell({
         onChange={(e) => setEditValue(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
-        className="h-full w-full border-0 bg-blue-50 px-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-900/30"
+        className="h-full w-full border-0 bg-[hsl(var(--primary))]/10 px-2 outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] dark:bg-[hsl(var(--primary))]/20"
       />
     );
   }
@@ -163,12 +162,15 @@ export function EditableCell({
   let cellClassName =
     "overflow-hidden text-ellipsis whitespace-nowrap cursor-default";
   if (isDeleted) {
-    cellClassName += " line-through bg-red-100 dark:bg-red-900/30";
+    cellClassName +=
+      " line-through bg-[hsl(var(--destructive))]/10 dark:bg-[hsl(var(--destructive))]/20";
   } else if (isModified) {
-    cellClassName += " bg-yellow-100 dark:bg-yellow-900/30";
+    cellClassName +=
+      " bg-[hsl(var(--warning))]/10 dark:bg-[hsl(var(--warning))]/20";
   }
   if (!readOnly && !isDeleted) {
-    cellClassName += " cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700";
+    cellClassName +=
+      " cursor-pointer hover:bg-[hsl(var(--accent))] dark:hover:bg-[hsl(var(--accent))]";
   }
 
   // Boolean: show checkbox in display mode too
@@ -177,6 +179,7 @@ export function EditableCell({
       <div
         className={`flex h-full items-center justify-center ${cellClassName}`}
         onDoubleClick={handleDoubleClick}
+        title="Double-click to edit"
       >
         <input
           type="checkbox"
@@ -189,9 +192,13 @@ export function EditableCell({
   }
 
   return (
-    <div className={cellClassName} onDoubleClick={handleDoubleClick}>
+    <div
+      className={cellClassName}
+      onDoubleClick={handleDoubleClick}
+      title="Double-click to edit"
+    >
       {isNull ? (
-        <span className="italic text-gray-400">NULL</span>
+        <span className="italic text-[hsl(var(--muted-foreground))]">NULL</span>
       ) : (
         displayValue
       )}

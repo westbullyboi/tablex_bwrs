@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import type { TableColumnInfo } from "../../types/query";
 
 interface InsertRowDialogProps {
@@ -14,20 +14,17 @@ export function InsertRowDialog({
   columns,
   onInsert,
 }: InsertRowDialogProps) {
-  const [values, setValues] = useState<Record<string, string>>({});
+  const initialValues = useMemo(() => {
+    const initial: Record<string, string> = {};
+    columns.forEach((col) => {
+      if (!col.is_auto_generated) {
+        initial[col.name] = "";
+      }
+    });
+    return initial;
+  }, [columns]);
 
-  // Reset values when dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      const initial: Record<string, string> = {};
-      columns.forEach((col) => {
-        if (!col.is_auto_generated) {
-          initial[col.name] = col.default_value ? "" : "";
-        }
-      });
-      setValues(initial);
-    }
-  }, [isOpen, columns]);
+  const [values, setValues] = useState(initialValues);
 
   if (!isOpen) return null;
 
@@ -89,12 +86,12 @@ export function InsertRowDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="max-h-[80vh] w-[500px] overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-800">
-        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+      <div className="max-h-[80vh] w-[500px] overflow-hidden rounded-lg bg-[hsl(var(--background))] shadow-xl">
+        <div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-4 py-3">
           <h2 className="text-lg font-semibold">Add New Row</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
           >
             <svg
               className="h-5 w-5"
@@ -117,12 +114,17 @@ export function InsertRowDialog({
             <div className="space-y-4">
               {editableColumns.map((col) => (
                 <div key={col.name}>
-                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor={`insert-${col.name}`}
+                    className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
+                  >
                     {col.name}
-                    <span className="ml-2 text-xs text-gray-400">
+                    <span className="ml-2 text-xs text-[hsl(var(--muted-foreground))]">
                       {col.data_type}
                       {!col.is_nullable && !col.default_value && (
-                        <span className="ml-1 text-red-500">*</span>
+                        <span className="ml-1 text-[hsl(var(--destructive))]">
+                          *
+                        </span>
                       )}
                       {col.default_value && (
                         <span className="ml-1">
@@ -139,17 +141,17 @@ export function InsertRowDialog({
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+          <div className="flex justify-end gap-2 border-t border-[hsl(var(--border))] px-4 py-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              className="rounded bg-[hsl(var(--muted))] px-4 py-2 text-sm font-medium text-[hsl(var(--foreground))] hover:bg-[hsl(var(--accent))]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="rounded bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-[hsl(var(--primary-foreground))] hover:opacity-90"
             >
               Add Row
             </button>
@@ -167,13 +169,16 @@ function renderInput(
 ) {
   const dataType = column.data_type.toLowerCase();
 
+  const inputId = `insert-${column.name}`;
+
   // Boolean
   if (dataType === "boolean") {
     return (
       <select
+        id={inputId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+        className="w-full rounded border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
       >
         <option value="">-- Select --</option>
         <option value="true">true</option>
@@ -187,10 +192,11 @@ function renderInput(
   if (dataType === "date") {
     return (
       <input
+        id={inputId}
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+        className="w-full rounded border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
       />
     );
   }
@@ -199,10 +205,11 @@ function renderInput(
   if (dataType.includes("timestamp")) {
     return (
       <input
+        id={inputId}
         type="datetime-local"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+        className="w-full rounded border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
       />
     );
   }
@@ -211,10 +218,11 @@ function renderInput(
   if (dataType === "time") {
     return (
       <input
+        id={inputId}
         type="time"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+        className="w-full rounded border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
       />
     );
   }
@@ -223,10 +231,11 @@ function renderInput(
   if (dataType === "text") {
     return (
       <textarea
+        id={inputId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
-        className="w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+        className="w-full rounded border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
         placeholder={column.is_nullable ? "NULL for null" : ""}
       />
     );
@@ -243,11 +252,12 @@ function renderInput(
   ) {
     return (
       <input
+        id={inputId}
         type="text"
         inputMode="numeric"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+        className="w-full rounded border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
         placeholder={column.is_nullable ? "NULL for null" : ""}
       />
     );
@@ -256,10 +266,11 @@ function renderInput(
   // Default text input
   return (
     <input
+      id={inputId}
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700"
+      className="w-full rounded border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))]"
       placeholder={column.is_nullable ? "NULL for null" : ""}
     />
   );

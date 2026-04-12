@@ -131,7 +131,10 @@ export function AiQueryBar({ onSettingsClick }: AiQueryBarProps) {
         </div>
 
         {error && (
-          <div className="mt-2 rounded-[var(--radius)] bg-[hsl(var(--destructive))]/10 p-2 text-xs text-[hsl(var(--destructive))]">
+          <div
+            role="alert"
+            className="mt-2 rounded-[var(--radius)] bg-[hsl(var(--destructive))]/10 p-2 text-xs text-[hsl(var(--destructive))]"
+          >
             {error}
           </div>
         )}

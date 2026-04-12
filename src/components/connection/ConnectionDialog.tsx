@@ -248,8 +248,11 @@ export function ConnectionDialog({ isOpen, onClose }: ConnectionDialogProps) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[13px] font-medium">Connection Name</label>
+            <label htmlFor="conn-name" className="text-[13px] font-medium">
+              Connection Name
+            </label>
             <Input
+              id="conn-name"
               type="text"
               name="name"
               value={form.name}
@@ -260,8 +263,11 @@ export function ConnectionDialog({ isOpen, onClose }: ConnectionDialogProps) {
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2 space-y-1.5">
-              <label className="text-[13px] font-medium">Host</label>
+              <label htmlFor="conn-host" className="text-[13px] font-medium">
+                Host
+              </label>
               <Input
+                id="conn-host"
                 type="text"
                 name="host"
                 value={form.host}
@@ -269,8 +275,11 @@ export function ConnectionDialog({ isOpen, onClose }: ConnectionDialogProps) {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[13px] font-medium">Port</label>
+              <label htmlFor="conn-port" className="text-[13px] font-medium">
+                Port
+              </label>
               <Input
+                id="conn-port"
                 type="number"
                 name="port"
                 value={form.port}
@@ -280,8 +289,11 @@ export function ConnectionDialog({ isOpen, onClose }: ConnectionDialogProps) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[13px] font-medium">Database</label>
+            <label htmlFor="conn-database" className="text-[13px] font-medium">
+              Database
+            </label>
             <Input
+              id="conn-database"
               type="text"
               name="database"
               value={form.database}
@@ -290,8 +302,11 @@ export function ConnectionDialog({ isOpen, onClose }: ConnectionDialogProps) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[13px] font-medium">Username</label>
+            <label htmlFor="conn-username" className="text-[13px] font-medium">
+              Username
+            </label>
             <Input
+              id="conn-username"
               type="text"
               name="username"
               value={form.username}
@@ -300,8 +315,11 @@ export function ConnectionDialog({ isOpen, onClose }: ConnectionDialogProps) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[13px] font-medium">Password</label>
+            <label htmlFor="conn-password" className="text-[13px] font-medium">
+              Password
+            </label>
             <Input
+              id="conn-password"
               type="password"
               name="password"
               value={form.password}
@@ -338,13 +356,19 @@ export function ConnectionDialog({ isOpen, onClose }: ConnectionDialogProps) {
           </div>
 
           {error && (
-            <div className="rounded-[var(--radius)] bg-[hsl(var(--destructive))]/10 p-2.5 text-[13px] text-[hsl(var(--destructive))]">
+            <div
+              role="alert"
+              className="rounded-[var(--radius)] bg-[hsl(var(--destructive))]/10 p-2.5 text-[13px] text-[hsl(var(--destructive))]"
+            >
               {error}
             </div>
           )}
 
           {testResult === "success" && (
-            <div className="rounded-[var(--radius)] bg-[hsl(var(--success))]/10 p-2.5 text-[13px] text-[hsl(var(--success))]">
+            <div
+              role="status"
+              className="rounded-[var(--radius)] bg-[hsl(var(--success))]/10 p-2.5 text-[13px] text-[hsl(var(--success))]"
+            >
               Connection successful!
             </div>
           )}

@@ -3,6 +3,7 @@ import {
   ReactFlow,
   Controls,
   Background,
+  MiniMap,
   useNodesState,
   useEdgesState,
   type Node,
@@ -16,7 +17,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { TableNode, type TableNodeData } from "./TableNode";
 import { useSchemaStore } from "../../store/schemaStore";
 import { useConnectionStore } from "../../store/connectionStore";
-import { useTheme } from "../../hooks/useTheme";
 import type { ForeignKeyInfo, TableInfo } from "../../types/schema";
 
 const nodeTypes = {
@@ -36,7 +36,6 @@ function getNodeDimensions(table: TableInfo) {
   };
 }
 
-// Apply dagre layout to nodes and edges
 function applyDagreLayout(
   tables: TableInfo[],
   foreignKeys: ForeignKeyInfo[],
@@ -46,24 +45,21 @@ function applyDagreLayout(
 ): { nodes: TableNodeType[]; edges: Edge[] } {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
-  // Configure dagre for horizontal layout
+  // Use TB so dagre arranges same-rank nodes horizontally
   g.setGraph({
-    rankdir: "LR", // Left to Right
-    nodesep: 80, // Horizontal separation between nodes
-    ranksep: 120, // Vertical separation between ranks
+    rankdir: "TB",
+    nodesep: 60,
+    ranksep: 80,
     marginx: 20,
     marginy: 20,
   });
 
-  // Add nodes to dagre
   tables.forEach((table) => {
     const { width, height } = getNodeDimensions(table);
     g.setNode(table.name, { width, height });
   });
 
-  // Add edges to dagre
   foreignKeys.forEach((fk) => {
-    // Only add edge if both source and target exist in tables
     if (
       tables.some((t) => t.name === fk.source_table) &&
       tables.some((t) => t.name === fk.target_table)
@@ -72,21 +68,21 @@ function applyDagreLayout(
     }
   });
 
-  // Run dagre layout
   Dagre.layout(g);
 
-  // Create React Flow nodes with dagre positions
+  // Swap x/y from TB layout to produce horizontal flow
+  // TB: ranks go top→bottom, peers go left→right
+  // After swap: ranks go left→right, peers go top→bottom
   const nodes: TableNodeType[] = tables.map((table) => {
-    const nodeWithPosition = g.node(table.name);
+    const dagreNode = g.node(table.name);
     const { width, height } = getNodeDimensions(table);
 
     return {
       id: table.name,
       type: "tableNode",
-      // Dagre gives center position, convert to top-left
       position: {
-        x: nodeWithPosition.x - width / 2,
-        y: nodeWithPosition.y - height / 2,
+        x: dagreNode.y - height / 2,
+        y: dagreNode.x - width / 2,
       },
       data: {
         label: table.name,
@@ -97,7 +93,6 @@ function applyDagreLayout(
     };
   });
 
-  // Create React Flow edges
   const edges: Edge[] = foreignKeys
     .filter(
       (fk) =>
@@ -126,15 +121,16 @@ export function ErDiagram() {
   const { schemas, focusedTable, setFocusedTable, clearFocusedTable } =
     useSchemaStore();
   const { isConnected } = useConnectionStore();
-  const { isDark } = useTheme();
   const [foreignKeys, setForeignKeys] = useState<ForeignKeyInfo[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<TableNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedSchema, setSelectedSchema] = useState<string>("public");
 
-  // Theme-aware colors
-  const edgeColor = isDark ? "#60a5fa" : "#3b82f6";
-  const bgColor = isDark ? "#374151" : "#e5e7eb";
+  const root = document.documentElement;
+  const getVar = (name: string) =>
+    getComputedStyle(root).getPropertyValue(name).trim();
+  const edgeColor = `hsl(${getVar("--er-edge")})`;
+  const bgColor = `hsl(${getVar("--er-bg-dot")})`;
 
   // Fetch foreign keys when schema changes
   useEffect(() => {
@@ -285,7 +281,7 @@ export function ErDiagram() {
           </>
         )}
       </div>
-      <div className="flex-1">
+      <div className="flex-1" style={{ minHeight: 0 }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -300,6 +296,15 @@ export function ErDiagram() {
         >
           <Controls />
           <Background color={bgColor} gap={16} />
+          <MiniMap
+            nodeStrokeWidth={3}
+            nodeColor="#60a5fa"
+            maskColor="rgba(0, 0, 0, 0.3)"
+            pannable
+            zoomable
+            position="bottom-right"
+            style={{ zIndex: 5 }}
+          />
         </ReactFlow>
       </div>
     </div>

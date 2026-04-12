@@ -68,9 +68,18 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="flex h-screen flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:rounded focus:bg-[hsl(var(--background))] focus:px-4 focus:py-2 focus:text-[hsl(var(--foreground))] focus:ring-2 focus:ring-[hsl(var(--ring))]"
+        >
+          Skip to main content
+        </a>
+        <h1 className="sr-only">tablex - Database IDE</h1>
         <Header />
         <ErrorBoundary>
-          <ResizableLayout />
+          <div id="main-content">
+            <ResizableLayout />
+          </div>
         </ErrorBoundary>
         <StatusBar />
       </div>

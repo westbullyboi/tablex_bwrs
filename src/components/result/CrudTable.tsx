@@ -448,6 +448,7 @@ export function CrudTable({
 
         {/* Insert Row Dialog */}
         <InsertRowDialog
+          key={String(isInsertDialogOpen)}
           isOpen={isInsertDialogOpen}
           onClose={() => setIsInsertDialogOpen(false)}
           columns={tableData.columns}
