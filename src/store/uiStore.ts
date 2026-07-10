@@ -17,6 +17,10 @@ interface UiState {
   sidebarWidth: number;
   /** Whether the sidebar is collapsed (hidden). */
   sidebarCollapsed: boolean;
+  /** Transient: command palette (⌘K) visibility. */
+  commandPaletteOpen: boolean;
+  /** Transient: keyboard-shortcuts dialog visibility. */
+  keyboardShortcutsOpen: boolean;
 
   setTheme: (theme: ThemeMode) => void;
   /** Cycle light → dark → system → light. */
@@ -25,6 +29,9 @@ interface UiState {
   toggleDensity: () => void;
   setSidebarWidth: (width: number) => void;
   toggleSidebar: () => void;
+  setCommandPaletteOpen: (open: boolean) => void;
+  toggleCommandPalette: () => void;
+  setKeyboardShortcutsOpen: (open: boolean) => void;
 }
 
 const THEME_ORDER: ThemeMode[] = ["light", "dark", "system"];
@@ -39,6 +46,8 @@ export const useUiStore = create<UiState>()(
       density: "comfortable",
       sidebarWidth: SIDEBAR_DEFAULT_WIDTH,
       sidebarCollapsed: false,
+      commandPaletteOpen: false,
+      keyboardShortcutsOpen: false,
 
       setTheme: (theme) => set({ theme }),
       cycleTheme: () => {
@@ -53,6 +62,10 @@ export const useUiStore = create<UiState>()(
       setSidebarWidth: (width) =>
         set({ sidebarWidth: clampSidebarWidth(width) }),
       toggleSidebar: () => set({ sidebarCollapsed: !get().sidebarCollapsed }),
+      setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
+      toggleCommandPalette: () =>
+        set({ commandPaletteOpen: !get().commandPaletteOpen }),
+      setKeyboardShortcutsOpen: (open) => set({ keyboardShortcutsOpen: open }),
     }),
     {
       name: "tablex-ui",

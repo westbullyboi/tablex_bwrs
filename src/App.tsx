@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import "./App.css";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Header, StatusBar, ResizableLayout } from "./components/layout";
+import { CommandPalette } from "./components/command";
 import { useAiStore } from "./store/aiStore";
 import { useConnectionStore } from "./store/connectionStore";
 import { useQueryStore } from "./store/queryStore";
@@ -20,6 +21,9 @@ function App() {
   const isConnected = useConnectionStore((state) => state.isConnected);
   const theme = useUiStore((state) => state.theme);
   const density = useUiStore((state) => state.density);
+  const toggleCommandPalette = useUiStore(
+    (state) => state.toggleCommandPalette
+  );
 
   // Apply the resolved theme (light/dark/system) to the document root.
   useEffect(() => {
@@ -46,6 +50,18 @@ function App() {
       root.removeAttribute("data-density");
     }
   }, [density]);
+
+  // Global command-palette shortcut (⌘K / Ctrl+K).
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        toggleCommandPalette();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [toggleCommandPalette]);
 
   useEffect(() => {
     loadSettings();
@@ -89,6 +105,7 @@ function App() {
           </div>
         </ErrorBoundary>
         <StatusBar />
+        <CommandPalette />
       </div>
     </ErrorBoundary>
   );

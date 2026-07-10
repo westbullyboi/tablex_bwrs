@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Database, Keyboard, Settings, Unplug } from "lucide-react";
+import { Command, Database, Keyboard, Settings, Unplug } from "lucide-react";
 import { ConnectionDialog } from "../connection";
 import { KeyboardShortcutsDialog } from "../KeyboardShortcutsDialog";
 import { useConnectionStore } from "../../store/connectionStore";
+import { useUiStore } from "../../store/uiStore";
 import { Button } from "../ui/button";
 import {
   Tooltip,
@@ -19,7 +19,9 @@ export function Header() {
     shouldShowConnectionDialog,
     setShouldShowConnectionDialog,
   } = useConnectionStore();
-  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const isShortcutsOpen = useUiStore((s) => s.keyboardShortcutsOpen);
+  const setIsShortcutsOpen = useUiStore((s) => s.setKeyboardShortcutsOpen);
+  const toggleCommandPalette = useUiStore((s) => s.toggleCommandPalette);
 
   return (
     <TooltipProvider>
@@ -62,6 +64,19 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={toggleCommandPalette}
+                aria-label="Open command palette"
+              >
+                <Command className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Command Palette (⌘K)</TooltipContent>
+          </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
