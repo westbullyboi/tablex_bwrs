@@ -12,8 +12,8 @@ export function AiSettingsDialog({ isOpen, onClose }: AiSettingsDialogProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-[hsl(var(--background))] p-6 shadow-xl dark:bg-[hsl(var(--card))]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[hsl(var(--overlay))]">
+      <div className="w-full max-w-md rounded-lg bg-[hsl(var(--background))] p-6 shadow-[var(--shadow-lg)] dark:bg-[hsl(var(--card))]">
         <h2 className="mb-4 text-lg font-semibold">AI Settings</h2>
 
         <div className="space-y-4">

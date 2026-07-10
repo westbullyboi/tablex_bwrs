@@ -77,6 +77,39 @@
   --radius: 0.5rem;
   --radius-sm: 0.375rem;
   --radius-lg: 0.75rem;
+
+  /* Elevation / shadows (UI rebuild P0) */
+  --shadow-sm: 0 1px 2px 0 hsl(220 43% 11% / 0.06);
+  --shadow-md:
+    0 4px 12px -2px hsl(220 43% 11% / 0.1),
+    0 2px 6px -2px hsl(220 43% 11% / 0.06);
+  --shadow-lg:
+    0 12px 32px -4px hsl(220 43% 11% / 0.14),
+    0 4px 10px -4px hsl(220 43% 11% / 0.08);
+
+  /* Overlay (modal backdrop) — used as hsl(var(--overlay)) */
+  --overlay: 222 47% 11% / 0.45;
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+
+  /* Density scale (comfortable default; compact overrides below) */
+  --density-scale: 1;
+  --control-h: 2rem;
+  --row-py: 0.5rem;
+  --tree-row-py: 0.25rem;
+}
+
+/* Compact density — opt-in via data-density on the root element (wired in P1) */
+:root[data-density="compact"] {
+  --density-scale: 0.875;
+  --control-h: 1.75rem;
+  --row-py: 0.3125rem;
+  --tree-row-py: 0.1875rem;
 }
 
 .dark {
@@ -135,6 +168,16 @@
   /* ER diagram */
   --er-edge: 217 91% 67%;
   --er-bg-dot: 216 34% 25%;
+
+  /* Elevation / shadows — deeper on dark backgrounds (UI rebuild P0) */
+  --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
+  --shadow-md:
+    0 4px 12px -2px hsl(0 0% 0% / 0.5), 0 2px 6px -2px hsl(0 0% 0% / 0.4);
+  --shadow-lg:
+    0 12px 32px -4px hsl(0 0% 0% / 0.6), 0 4px 10px -4px hsl(0 0% 0% / 0.45);
+
+  /* Overlay (modal backdrop) */
+  --overlay: 224 71% 4% / 0.6;
 }
 
 *,

@@ -23,7 +23,7 @@ export function Header() {
 
   return (
     <TooltipProvider>
-      <header className="flex h-11 items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 shadow-sm">
+      <header className="flex h-11 items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 shadow-[var(--shadow-sm)]">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"

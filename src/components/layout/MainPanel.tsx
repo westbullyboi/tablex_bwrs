@@ -188,7 +188,7 @@ export function MainPanel() {
 
           {/* History overlay panel */}
           {isHistoryOpen && (
-            <div className="absolute right-0 top-0 z-10 h-full w-[320px] border-l border-[hsl(var(--border))] shadow-lg">
+            <div className="absolute right-0 top-0 z-10 h-full w-[320px] border-l border-[hsl(var(--border))] shadow-[var(--shadow-lg)]">
               <QueryHistory onClose={() => setIsHistoryOpen(false)} />
             </div>
           )}

@@ -85,8 +85,8 @@ export function InsertRowDialog({
   const editableColumns = columns.filter((col) => !col.is_auto_generated);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="max-h-[80vh] w-[500px] overflow-hidden rounded-lg bg-[hsl(var(--background))] shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[hsl(var(--overlay))]">
+      <div className="max-h-[80vh] w-[500px] overflow-hidden rounded-lg bg-[hsl(var(--background))] shadow-[var(--shadow-lg)]">
         <div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-4 py-3">
           <h2 className="text-lg font-semibold">Add New Row</h2>
           <button
