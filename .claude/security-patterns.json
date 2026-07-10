@@ -1,0 +1,26 @@
+{
+  "patterns": [
+    {
+      "rule_name": "sql_string_building_rust",
+      "regex": "format!\\s*\\(\\s*\"[^\"\\n]*(?i:select|insert|update|delete|drop|alter)\\b",
+      "paths": ["**/src-tauri/**/*.rs"],
+      "reminder": "SQL が文字列連結で組み立てられている可能性があります。ユーザー由来の値はバインドパラメータで渡し、識別子は許可リスト検証かクォートを通してください（SQL インジェクション）。"
+    },
+    {
+      "rule_name": "hardcoded_credential_prefix",
+      "substrings": ["sk-ant-", "sk_live_", "AKIA", "AIza"],
+      "reminder": "認証情報らしきプレフィックスがハードコードされています。設定/シークレットストアから読み込んでください。"
+    },
+    {
+      "rule_name": "logging_possible_secret",
+      "regex": "(?i)(println!|eprintln!|log::(?:info|debug|warn|error|trace)!|console\\.(?:log|info|debug|warn))[^\\n]*(password|passwd|secret|api[_-]?key|access[_-]?token|connection[_-]?string|conn[_-]?str)",
+      "reminder": "パスワード・トークン・接続文字列などの機微情報をログ出力している疑いがあります。ログから除外するかマスクしてください。"
+    },
+    {
+      "rule_name": "path_traversal_input",
+      "regex": "(?i)(read_to_string|std::fs::(?:read|write|File::(?:open|create))|fs::read|fs::write)\\s*\\(",
+      "paths": ["**/src-tauri/src/commands/**/*.rs"],
+      "reminder": "Tauri コマンドでファイルパスを扱っています。フロントエンド由来のパスはパストラバーサル（..）検証と書き込み先の検証を行ってください。"
+    }
+  ]
+}
