@@ -5,6 +5,7 @@ import { Header, StatusBar, ResizableLayout } from "./components/layout";
 import { useAiStore } from "./store/aiStore";
 import { useConnectionStore } from "./store/connectionStore";
 import { useQueryStore } from "./store/queryStore";
+import { useUiStore, resolveIsDark } from "./store/uiStore";
 
 function App() {
   const loadSettings = useAiStore((state) => state.loadSettings);
@@ -17,28 +18,34 @@ function App() {
   );
   const connectToSaved = useConnectionStore((state) => state.connectToSaved);
   const isConnected = useConnectionStore((state) => state.isConnected);
+  const theme = useUiStore((state) => state.theme);
+  const density = useUiStore((state) => state.density);
 
-  // Apply dark mode based on system preference
+  // Apply the resolved theme (light/dark/system) to the document root.
   useEffect(() => {
+    const root = document.documentElement;
+    const apply = () => root.classList.toggle("dark", resolveIsDark(theme));
+    apply();
+
+    // Only react to OS changes while following the system preference.
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const applyTheme = (isDark: boolean) => {
-      if (isDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+    const handler = () => {
+      if (theme === "system") apply();
     };
-
-    // Apply initial theme
-    applyTheme(mediaQuery.matches);
-
-    // Listen for changes
-    const handler = (e: MediaQueryListEvent) => applyTheme(e.matches);
     mediaQuery.addEventListener("change", handler);
 
     return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
+  }, [theme]);
+
+  // Apply the density preference via the data-density attribute (drives tokens).
+  useEffect(() => {
+    const root = document.documentElement;
+    if (density === "compact") {
+      root.setAttribute("data-density", "compact");
+    } else {
+      root.removeAttribute("data-density");
+    }
+  }, [density]);
 
   useEffect(() => {
     loadSettings();

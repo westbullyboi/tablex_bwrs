@@ -1,20 +1,28 @@
 import { useState, useEffect } from "react";
 
+/**
+ * Reflects the theme that is actually applied to the document, by observing the
+ * `dark` class on the root element (set from `uiStore` in App). This keeps
+ * consumers such as the Monaco editor and the ER diagram in sync with the
+ * explicit theme toggle, not just the OS preference.
+ */
 export function useTheme() {
   const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (typeof document !== "undefined") {
+      return document.documentElement.classList.contains("dark");
     }
     return false;
   });
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains("dark"));
+    update();
 
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-    mediaQuery.addEventListener("change", handler);
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
 
-    return () => mediaQuery.removeEventListener("change", handler);
+    return () => observer.disconnect();
   }, []);
 
   return { isDark };

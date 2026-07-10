@@ -1,13 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { MainPanel } from "./MainPanel";
-
-const MIN_SIDEBAR_WIDTH = 180;
-const MAX_SIDEBAR_WIDTH = 500;
-const DEFAULT_SIDEBAR_WIDTH = 240;
+import {
+  useUiStore,
+  SIDEBAR_MIN_WIDTH,
+  SIDEBAR_MAX_WIDTH,
+} from "../../store/uiStore";
 
 export function ResizableLayout() {
-  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+  const sidebarWidth = useUiStore((state) => state.sidebarWidth);
+  const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
+  const setSidebarWidth = useUiStore((state) => state.setSidebarWidth);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -20,12 +23,12 @@ export function ResizableLayout() {
       if (!isDragging) return;
 
       const newWidth = Math.min(
-        Math.max(e.clientX, MIN_SIDEBAR_WIDTH),
-        MAX_SIDEBAR_WIDTH
+        Math.max(e.clientX, SIDEBAR_MIN_WIDTH),
+        SIDEBAR_MAX_WIDTH
       );
       setSidebarWidth(newWidth);
     },
-    [isDragging]
+    [isDragging, setSidebarWidth]
   );
 
   const handleMouseUp = useCallback(() => {
@@ -50,13 +53,20 @@ export function ResizableLayout() {
 
   return (
     <div className="flex flex-1 overflow-hidden">
-      <Sidebar width={sidebarWidth} />
-      <div
-        onMouseDown={handleMouseDown}
-        className={`w-1 cursor-col-resize bg-gray-200 hover:bg-blue-400 dark:bg-gray-700 dark:hover:bg-blue-500 ${
-          isDragging ? "bg-blue-500 dark:bg-blue-500" : ""
-        }`}
-      />
+      {!sidebarCollapsed && (
+        <>
+          <Sidebar width={sidebarWidth} />
+          <div
+            onMouseDown={handleMouseDown}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize sidebar"
+            className={`w-1 cursor-col-resize bg-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--primary))] ${
+              isDragging ? "bg-[hsl(var(--primary))]" : ""
+            }`}
+          />
+        </>
+      )}
       <MainPanel />
     </div>
   );
