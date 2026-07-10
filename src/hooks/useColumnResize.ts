@@ -30,8 +30,13 @@ export function useColumnResize(
   );
   const [resizing, setResizing] = useState<ResizeState | null>(null);
 
-  // Update widths when column count changes
-  useEffect(() => {
+  // Adjust widths when the column count changes. Done during render by
+  // tracking the previous count in state (React's recommended pattern),
+  // rather than in an effect, so the widths array stays consistent with
+  // columnCount without an extra render pass.
+  const [prevColumnCount, setPrevColumnCount] = useState(columnCount);
+  if (prevColumnCount !== columnCount) {
+    setPrevColumnCount(columnCount);
     setColumnWidths((prev) => {
       if (prev.length === columnCount) return prev;
       if (columnCount > prev.length) {
@@ -42,7 +47,7 @@ export function useColumnResize(
       }
       return prev.slice(0, columnCount);
     });
-  }, [columnCount, defaultWidth]);
+  }
 
   const handleResizeStart = useCallback(
     (e: React.MouseEvent, index: number) => {

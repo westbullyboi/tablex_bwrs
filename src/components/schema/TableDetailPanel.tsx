@@ -21,12 +21,26 @@ export function TableDetailPanel({
   >("columns");
 
   useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-    invoke<TableDetailInfo>("get_table_detail", { schemaName, tableName })
-      .then(setDetail)
-      .catch((err) => setError(String(err)))
-      .finally(() => setIsLoading(false));
+    let cancelled = false;
+    const load = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await invoke<TableDetailInfo>("get_table_detail", {
+          schemaName,
+          tableName,
+        });
+        if (!cancelled) setDetail(result);
+      } catch (err) {
+        if (!cancelled) setError(String(err));
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, [schemaName, tableName]);
 
   if (isLoading) {

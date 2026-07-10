@@ -47,41 +47,45 @@ pub fn run() {
 #[cfg(test)]
 mod tests {
     use super::types::*;
-    use ts_rs::TS;
+    use ts_rs::{Config, TS};
 
     #[test]
     fn export_bindings() {
+        // ts-rs v12 requires an explicit Config passed to `export_all`.
+        // Read it from env vars (e.g. TS_RS_EXPORT_DIR) with defaults otherwise.
+        let cfg = Config::from_env();
+
         // Connection types
-        ConnectionConfig::export_all().unwrap();
-        SslMode::export_all().unwrap();
-        SavedConnection::export_all().unwrap();
-        SaveConnectionInput::export_all().unwrap();
+        ConnectionConfig::export_all(&cfg).unwrap();
+        SslMode::export_all(&cfg).unwrap();
+        SavedConnection::export_all(&cfg).unwrap();
+        SaveConnectionInput::export_all(&cfg).unwrap();
 
         // Query types
-        ColumnMetadata::export_all().unwrap();
-        QueryResult::export_all().unwrap();
-        QueryHistoryItem::export_all().unwrap();
+        ColumnMetadata::export_all(&cfg).unwrap();
+        QueryResult::export_all(&cfg).unwrap();
+        QueryHistoryItem::export_all(&cfg).unwrap();
 
         // Schema types
-        ColumnInfo::export_all().unwrap();
-        TableInfo::export_all().unwrap();
-        SchemaInfo::export_all().unwrap();
-        ForeignKeyInfo::export_all().unwrap();
-        IndexInfo::export_all().unwrap();
-        ConstraintInfo::export_all().unwrap();
-        TableDetailInfo::export_all().unwrap();
+        ColumnInfo::export_all(&cfg).unwrap();
+        TableInfo::export_all(&cfg).unwrap();
+        SchemaInfo::export_all(&cfg).unwrap();
+        ForeignKeyInfo::export_all(&cfg).unwrap();
+        IndexInfo::export_all(&cfg).unwrap();
+        ConstraintInfo::export_all(&cfg).unwrap();
+        TableDetailInfo::export_all(&cfg).unwrap();
 
         // Table data types
-        TableDataRequest::export_all().unwrap();
-        TableColumnInfo::export_all().unwrap();
-        TableRow::export_all().unwrap();
-        TableData::export_all().unwrap();
-        RowUpdate::export_all().unwrap();
-        RowInsert::export_all().unwrap();
-        RowDelete::export_all().unwrap();
+        TableDataRequest::export_all(&cfg).unwrap();
+        TableColumnInfo::export_all(&cfg).unwrap();
+        TableRow::export_all(&cfg).unwrap();
+        TableData::export_all(&cfg).unwrap();
+        RowUpdate::export_all(&cfg).unwrap();
+        RowInsert::export_all(&cfg).unwrap();
+        RowDelete::export_all(&cfg).unwrap();
 
         // AI types
-        AiProvider::export_all().unwrap();
-        GenerateSqlRequest::export_all().unwrap();
+        AiProvider::export_all(&cfg).unwrap();
+        GenerateSqlRequest::export_all(&cfg).unwrap();
     }
 }
